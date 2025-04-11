@@ -1,33 +1,122 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Mall</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nadim's Shop</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    header { background-color: #333; color: #fff; padding: 1em; text-align: center; }
+    .products { display: flex; flex-wrap: wrap; justify-content: center; padding: 1em; }
+    .product { border: 1px solid #ddd; border-radius: 8px; padding: 1em; margin: 1em; width: 200px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    button { padding: 0.5em 1em; background-color: green; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+    #cart { position: fixed; top: 1em; right: 1em; background: #f4f4f4; padding: 1em; border: 1px solid #ccc; border-radius: 8px; max-width: 90%; }
+    #checkout { margin-top: 1em; background-color: #007bff; color: white; border: none; padding: 0.5em 1em; border-radius: 4px; cursor: pointer; }
+    #addForm { text-align: center; margin: 1em auto; max-width: 300px; }
+    #addForm input { padding: 0.5em; margin: 0.3em; width: 80%; border: 1px solid #ccc; border-radius: 4px; }
+
+    @media (max-width: 768px) {
+      .products { flex-direction: column; align-items: center; }
+      .product { width: 90%; }
+      #cart { position: static; margin: 1em auto; width: 90%; }
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>Student Mall</h1>
-        <p>Your one-stop shop for student essentials</p>
-    </header>
-    <main>
-        <section class="products">
-            <div class="product-card">
-                <img src="images/notebook.jpg" alt="Apsara Notebook">
-                <h2>Apsara Notebook</h2>
-                <p>₹30</p>
-            </div>
-            <div class="product-card">
-                <img src="images/bottle.jpg" alt="Water Bottle">
-                <h2>Water Bottle</h2>
-                <p>₹99</p>
-            </div>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2025 Student Mall</p>
-    </footer>
+  <header>
+    <h1>Welcome to Nadim's Shop</h1>
+  </header>
+
+  <div id="addForm">
+    <h3>Add New Product</h3>
+    <input type="text" id="newName" placeholder="Product Name" /> <br />
+    <input type="number" id="newPrice" placeholder="Price (Rs.)" /> <br />
+    <button onclick="addNewProduct()">Add Product</button>
+  </div>
+
+  <div class="products" id="productList"></div>
+
+  <div id="cart">
+    <h3>Cart</h3>
+    <ul id="cartItems"></ul>
+    <strong>Total: Rs. <span id="total">0</span></strong>
+    <br />
+    <button id="checkout" onclick="goToCheckout()">Go to Checkout</button>
+  </div>
+
+  <script>
+    let cart = [];
+
+    function addToCart(product, price) {
+      cart.push({ product, price });
+      updateCart();
+    }
+
+    function updateCart() {
+      const cartItems = document.getElementById("cartItems");
+      const total = document.getElementById("total");
+      cartItems.innerHTML = "";
+      let sum = 0;
+      cart.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = `${item.product} - Rs. ${item.price}`;
+        cartItems.appendChild(li);
+        sum += item.price;
+      });
+      total.textContent = sum;
+    }
+
+    function goToCheckout() {
+      let summary = "Order Summary:\n";
+      cart.forEach(item => {
+        summary += `${item.product} - Rs. ${item.price}\n`;
+      });
+      summary += `Total: Rs. ${cart.reduce((sum, item) => sum + item.price, 0)}`;
+      alert(summary + "\n\n(Checkout functionality coming soon!)");
+    }
+
+    function addNewProduct() {
+      const name = document.getElementById("newName").value;
+      const price = parseInt(document.getElementById("newPrice").value);
+      if (name && price) {
+        const newProduct = { name, price };
+        const stored = JSON.parse(localStorage.getItem("products")) || [];
+        stored.push(newProduct);
+        localStorage.setItem("products", JSON.stringify(stored));
+        renderProducts();
+        document.getElementById("newName").value = "";
+        document.getElementById("newPrice").value = "";
+      } else {
+        alert("Please enter valid product name and price.");
+      }
+    }
+
+    function renderProducts() {
+      const productList = document.getElementById("productList");
+      productList.innerHTML = "";
+      const stored = JSON.parse(localStorage.getItem("products")) || [];
+      stored.forEach(p => {
+        const productDiv = document.createElement("div");
+        productDiv.className = "product";
+        productDiv.innerHTML = `
+          <h3>${p.name}</h3>
+          <p>Rs. ${p.price}</p>
+          <button onclick="addToCart('${p.name}', ${p.price})">Add to Cart</button>
+        `;
+        productList.appendChild(productDiv);
+      });
+    }
+
+    window.onload = function () {
+      if (!localStorage.getItem("products")) {
+        const initial = [
+          { name: "Product 1", price: 499 },
+          { name: "Product 2", price: 799 }
+        ];
+        localStorage.setItem("products", JSON.stringify(initial));
+      }
+      renderProducts();
+    };
+  </script>
 </body>
 </html>
