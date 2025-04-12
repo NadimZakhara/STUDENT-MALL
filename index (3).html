@@ -1,0 +1,115 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STUDENT-MALL</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <header class="bg-blue-600 text-white p-4 text-center text-2xl font-bold">
+    STUDENT-MALL
+  </header>
+
+  <nav class="flex justify-center gap-4 bg-white py-2 shadow">
+    <button onclick="showCategory('student')" class="bg-blue-500 text-white px-4 py-1 rounded">Student Zone</button>
+    <button onclick="showCategory('kiryana')" class="bg-green-500 text-white px-4 py-1 rounded">Kiryana Store</button>
+    <button onclick="showCart()" class="bg-yellow-500 text-white px-4 py-1 rounded">Cart</button>
+  </nav>
+
+  <main class="p-4">
+    <section id="products" class="grid grid-cols-2 md:grid-cols-4 gap-4"></section>
+
+    <section id="cart" class="hidden">
+      <h2 class="text-xl font-bold mb-2">Your Cart</h2>
+      <ul id="cartItems" class="mb-4"></ul>
+      <p class="font-semibold">Total: ₹<span id="cartTotal">0</span></p>
+      <button onclick="showOrderForm()" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded">Place Order</button>
+    </section>
+
+    <section id="orderForm" class="hidden mt-4">
+      <h2 class="text-xl font-bold mb-2">Order Details</h2>
+      <form onsubmit="submitOrder(event)" class="flex flex-col gap-2 max-w-md">
+        <input required type="text" placeholder="Name" class="border p-2 rounded">
+        <input required type="text" placeholder="Address" class="border p-2 rounded">
+        <input required type="tel" placeholder="Mobile Number" class="border p-2 rounded">
+        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">Submit Order</button>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    const productList = {
+      student: [
+        { name: 'Notebook', price: 30 },
+        { name: 'Pen Pack', price: 25 },
+        { name: 'Calculator', price: 250 },
+        { name: 'School Bag', price: 450 }
+      ],
+      kiryana: [
+        { name: 'Chawal (1kg)', price: 60 },
+        { name: 'Dal (1kg)', price: 80 },
+        { name: 'Cooking Oil (1L)', price: 130 },
+        { name: 'Biscuit Pack', price: 20 }
+      ]
+    };
+
+    const cart = [];
+
+    function showCategory(category) {
+      document.getElementById('products').innerHTML = '';
+      document.getElementById('cart').classList.add('hidden');
+      document.getElementById('orderForm').classList.add('hidden');
+
+      productList[category].forEach((item, i) => {
+        const card = document.createElement('div');
+        card.className = 'bg-white p-4 rounded shadow';
+        card.innerHTML = `
+          <h3 class="font-bold text-lg">${item.name}</h3>
+          <p>₹${item.price}</p>
+          <button onclick="addToCart('${item.name}', ${item.price})" class="mt-2 bg-blue-500 text-white px-3 py-1 rounded">Add to Cart</button>
+        `;
+        document.getElementById('products').appendChild(card);
+      });
+    }
+
+    function addToCart(name, price) {
+      cart.push({ name, price });
+      alert(`${name} added to cart!`);
+    }
+
+    function showCart() {
+      const cartList = document.getElementById('cartItems');
+      const total = cart.reduce((sum, item) => sum + item.price, 0);
+      cartList.innerHTML = '';
+      cart.forEach((item, i) => {
+        const li = document.createElement('li');
+        li.textContent = `${item.name} - ₹${item.price}`;
+        cartList.appendChild(li);
+      });
+      document.getElementById('cartTotal').textContent = total;
+      document.getElementById('products').innerHTML = '';
+      document.getElementById('cart').classList.remove('hidden');
+      document.getElementById('orderForm').classList.add('hidden');
+    }
+
+    function showOrderForm() {
+      document.getElementById('orderForm').classList.remove('hidden');
+    }
+
+    function submitOrder(e) {
+      e.preventDefault();
+      alert('Order placed successfully! Thank you.');
+      cart.length = 0;
+      document.getElementById('cartItems').innerHTML = '';
+      document.getElementById('cartTotal').textContent = '0';
+      e.target.reset();
+      document.getElementById('orderForm').classList.add('hidden');
+    }
+
+    // Default: show student zone
+    showCategory('student');
+  </script>
+</body>
+</html>
